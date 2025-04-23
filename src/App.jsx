@@ -13,6 +13,7 @@ function App() {
         <Route path="/signup" element={< RegisterForm />} />
         <Route path="/quiz/:id" element={<QuizCard />} />
         <Route path="/" element={<Navigate to="/quiz" replace />} />
+        <Route path="*" element={<Navigate to="/quiz" replace />} />
       </Routes>
     </>
   )
