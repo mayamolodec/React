@@ -9,11 +9,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/quiz" element={<ListQuizzes />} />
+        <Route path="/quizzes" element={<ListQuizzes />} />
         <Route path="/signup" element={< RegisterForm />} />
-        <Route path="/quiz/:id" element={<QuizCard />} />
-        <Route path="/" element={<Navigate to="/quiz" replace />} />
-        <Route path="*" element={<Navigate to="/quiz" replace />} />
+        <Route path="/quizzes/:id" element={<QuizCard />} />
+        <Route path="/" element={<Navigate to="/quizzes" replace />} />
+        <Route path="*" element={<Navigate to="/quizzes" replace />} />
       </Routes>
     </>
   )
