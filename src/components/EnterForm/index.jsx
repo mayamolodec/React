@@ -1,41 +1,41 @@
 import React from "react";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import regiFormImg from "../../assets/Frame5_2.svg";
+import { useSignInMutation } from "../../store/quizApi";
 import styles from "../RegisterForm/RegisterForm.module.scss";
 
 export default function EnterForm() {
-    const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { login: "", email: "", password: "", passwordCheck: "" } });
+    const navigate = useNavigate();
+    const { register, handleSubmit, setError, formState: { errors }, watch } = useForm({ defaultValues: { email: "", password: "" } });
     const [shake, setShake] = useState(false);
     const password = useRef({});
+    const [signIn] = useSignInMutation();
 
     password.current = watch("password");
 
     const onSubmit = async (e) => {
-        const loginData = JSON.stringify(e);
-
+        console.log(e);
         try {
-            const res = await fetch("http://localhost:3000/users/sign-up", {
-                method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: loginData,
-            });
+            const response = await signIn(e).unwrap();
 
-            if (!res.ok) {
-                const errorData = await res.json();
-
-                throw new Error(errorData.message || "Sign in failed");
-            }
-
-            const result = await res.json();
-
-            console.log("Success:", result);
+            console.log("SignIn successful", response);
+            navigate("/quiz");
         }
         catch (error) {
-            console.error("Error:", error.message);
+            if (error?.status === 401) {
+                setError("password", {
+                    type: "manual",
+                    message: "Wrong password or email",
+                });
+                setShake(true);
+                setTimeout(() => setShake(false), 500);
+            } else {
+                console.error("Unexpected error:", error);
+            }
         }
-
     }
 
     const onInvalid = () => {
@@ -58,10 +58,12 @@ export default function EnterForm() {
                     <input {...register("password", { required: errMessage, minLength: { value: 6, message: "Password must have at least 6 characters" } })}
                         className={`${styles["container__form-input"]} ${errors.password ? styles.error : ""}`} type="password" placeholder="Password" />
                     {errors.password && <p className={styles["container__form-error"]}>{errors.password.message}</p>}
-
                     <button className={styles["container__form-button"]} type="submit">
                         OK
                     </button>
+                    <p className={styles["container__form-nav"]} onClick={() => navigate("/sign-up")}>
+                        Don’t have an account? Sign Up
+                    </p>
                 </form>
                 <img className={styles.container__img} src={regiFormImg} alt="Registration illustration" />
             </div>

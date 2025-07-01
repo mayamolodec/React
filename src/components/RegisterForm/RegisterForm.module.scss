@@ -103,6 +103,17 @@ $border-radius-small: 0.6em;
         }
     }
 
+    &__form-nav {
+        color: #9F50B1;
+        font-size: 0.7em;
+        font-weight: 100;
+        cursor: pointer;
+        // background-color: #eaeaea;
+        // border-radius: $border-radius-small;
+        margin: 0;
+        text-decoration: underline;
+    }
+
     &__img {
         object-fit: cover;
         width: 21em;

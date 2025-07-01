@@ -1,21 +1,48 @@
 import React from "react";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import regiFormImg from "../../assets/Frame5_2.svg";
+import { useSignUpMutation } from "../../store/quizApi";
 
 import styles from "./RegisterForm.module.scss"
 
 export default function RegisterForm() {
-    const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { login: "", email: "", password: "", passwordCheck: "" } });
+    const navigate = useNavigate();
+    const { register, handleSubmit, setError, formState: { errors }, watch } = useForm({ defaultValues: { name: "", email: "", password: "", passwordCheck: "" } });
     const [shake, setShake] = useState(false);
     const password = useRef({});
+    const [signUp] = useSignUpMutation();
 
     password.current = watch("password");
 
-    const onSubmit = (data) => {
-        alert(JSON.stringify(data));
+    const onSubmit = async (e) => {
+        console.log(e);
+        delete e["passwordCheck"];
+
+        try {
+            const response = await signUp(e).unwrap();
+
+            console.log("SignUp successful", response);
+            navigate("/quiz");
+        }
+        catch (error) {
+            if (error?.status === 400) {
+                console.log("User already exists");
+                setError("email", {
+                    type: "manual",
+                    message: "User already exists",
+                });
+                setShake(true);
+                setTimeout(() => setShake(false), 500);
+            } else {
+                console.error("Unexpected error:", error);
+            }
+        }
+
     }
+
     const onInvalid = () => {
         setShake(true);
         setTimeout(() => setShake(false), 500);
@@ -28,9 +55,9 @@ export default function RegisterForm() {
             <div className={styles.container}>
                 <form className={`${styles["container__form"]} ${shake ? styles["shake"] : ""}`} onSubmit={handleSubmit(onSubmit, onInvalid)}>
                     <div className={styles["container__form-headline"]}>Sign Up</div>
-                    <input {...register("login", { required: errMessage })}
-                        className={`${styles["container__form-input"]} ${errors.login ? styles.error : ""}`} type="text" placeholder="Login" />
-                    {errors.login && <p className={styles["container__form-error"]}>{errors.login.message}</p>}
+                    <input {...register("name", { required: errMessage })}
+                        className={`${styles["container__form-input"]} ${errors.name ? styles.error : ""}`} type="text" placeholder="Name" />
+                    {errors.name && <p className={styles["container__form-error"]}>{errors.name.message}</p>}
 
                     <input {...register("email", { required: errMessage, pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email" } })} type="text"
                         className={`${styles["container__form-input"]} ${errors.email ? styles.error : ""}`} placeholder="E-mail" />
@@ -47,6 +74,7 @@ export default function RegisterForm() {
                     <button className={styles["container__form-button"]} type="submit">
                         Send
                     </button>
+                    <p className={styles["container__form-nav"]} onClick={() => navigate("/sign-in")}>Already have an account? Sign In</p>
                 </form>
                 <img className={styles.container__img} src={regiFormImg} alt="Registration illustration" />
             </div>
