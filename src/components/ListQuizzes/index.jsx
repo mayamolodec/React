@@ -1,11 +1,25 @@
 import * as React from "react"
 
+// import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import { useEffect } from "react";
 import { useGetQuizzesQuery } from "../../store/quizApi";
+// import { useAuth } from "../../utils/auth";
 import QuizButton from "../QuizButton";
 
 import styles from "./ListQuizzes.module.scss"
 
 export default function ListQuizzes() {
+  // const navigate = useNavigate();
+  // const token = useSelector((state) => state.auth.token);
+
+  // // const isAuthenticated = useAuth();
+
+  // // if (!isAuthenticated) {
+  // //   navigate("quizes/sign-in");
+
+  // //   return null;
+  // // }
 
   const { data, isLoading, error } = useGetQuizzesQuery();
 
